@@ -1,8 +1,41 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-Console.WriteLine("Hello, World!");
+using (var context = new BlogDataContext())
+{
+    var posts = context.Posts.Include(o => o.Author).ToList();
+    foreach (var item in posts)
+    {
+        Console.WriteLine($"{item.Title}, {item.Author.Name}");
+    }
+}
+
+using (var context = new BlogDataContext())
+{
+    Author author1 = new Author { Name = "Henryk Sienkiewicz", Email = "hs@wp.pl" };
+    context.Authors.Add(author1);
+
+    Author author2 = new Author { Name = "Bolek Prus", Email = "bp@wp.pl" };
+    context.Authors.Add(author2);
+
+    var post1 = new Post
+    {
+        Title = "Ogniem i mieczem", Content="Polska szlachecka w pełni", Author=author1
+    };
+    var post2 = new Post
+    {
+        Title = "Lalka",
+        Content = "Niedobra Iza",
+        Author = author2
+    };
+    context.Posts.Add(post1);
+    context.Posts.Add(post2);
+
+    context.SaveChanges();
+
+}
+
+
 
 public class BlogDataContext : DbContext
 {
